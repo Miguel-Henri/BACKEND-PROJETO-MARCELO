@@ -1,4 +1,4 @@
-package ifsp.edu.br.IFBANK.controller;
+package ifsp.edu.br.IFBANK.Controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
