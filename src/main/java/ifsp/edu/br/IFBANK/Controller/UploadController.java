@@ -12,8 +12,7 @@ import java.util.UUID;
 public class UploadController {
 
     @PostMapping
-    public ResponseEntity<String> upload(
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) {
 
         try {
 
