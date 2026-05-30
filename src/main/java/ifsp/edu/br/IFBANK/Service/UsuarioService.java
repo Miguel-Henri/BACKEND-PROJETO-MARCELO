@@ -18,4 +18,12 @@ public class UsuarioService {
         repository.save(usuario);
     }
 
+    public Usuario buscarPorId(Integer id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+    
+    public Usuario salvar(Usuario usuario) {
+        return repository.save(usuario);
+    }
 }
