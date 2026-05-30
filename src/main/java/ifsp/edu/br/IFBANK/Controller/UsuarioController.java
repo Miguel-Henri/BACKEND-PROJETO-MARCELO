@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ifsp.edu.br.IFBANK.Service.UsuarioService;
 import ifsp.edu.br.IFBANK.model.Usuario;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,15 +24,15 @@ public class UsuarioController {
     }
 
     @PostMapping("/novo")
-    public String criarUser(@RequestBody Usuario usuario) {
+   public ResponseEntity<String> criarUser(@RequestBody Usuario usuario) {
+    try {
         usuarioService.criar(usuario);
-        System.out.println("Criando usuário: " + usuario.getNome());
-        return usuario.toString();
+        return ResponseEntity.status(201).build();
+    } catch (DataIntegrityViolationException e) {
+        return ResponseEntity.status(409).body("E-mail já cadastrado.");
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Erro ao cadastrar usuário.");
     }
-    
-    @GetMapping("/hello") // Shortcut for GET /home/hello
-    public String sayHello() {
-        return "Hello World!";
-    }
-    
+}
+
 }

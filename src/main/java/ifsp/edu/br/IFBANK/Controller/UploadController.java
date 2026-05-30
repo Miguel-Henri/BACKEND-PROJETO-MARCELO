@@ -40,7 +40,7 @@ public class UploadController {
             );
 
             return ResponseEntity.ok(
-                    "Imagem salva: " + nomeArquivo
+                    "uploads/" + nomeArquivo
             );
 
         } catch (Exception e) {
