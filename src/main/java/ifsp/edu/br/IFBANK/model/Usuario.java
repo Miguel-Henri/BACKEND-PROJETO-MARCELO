@@ -16,6 +16,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -51,6 +53,7 @@ public class Usuario {
     @Column(name = "data_ultima_atualizacao")
     private LocalDateTime dataUltimaAtualizacao = LocalDateTime.now();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Conta> contas;
 

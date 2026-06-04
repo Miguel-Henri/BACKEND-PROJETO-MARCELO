@@ -1,9 +1,42 @@
-HELP.md
-.gradle
+# Gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# Spring Boot
+*.jar
+*.war
+*.ear
+*.nar
+spring-shell.log
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+application-secret*.yml
+application-secret*.properties
+**/src/main/resources/application-local*
+**/src/main/resources/application-secret*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# JVM
+hs_err_pid*
+replay_pid*
 
 ### STS ###
 .apt_generated
@@ -18,13 +51,19 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+### Eclipse ###
+.classpath
+.project
+.settings/
+.metadata/
 
 ### NetBeans ###
 /nbproject/private/
@@ -35,3 +74,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Test reports
+**/target/surefire-reports/
+**/test-results/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~

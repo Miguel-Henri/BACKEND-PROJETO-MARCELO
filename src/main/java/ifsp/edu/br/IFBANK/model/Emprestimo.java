@@ -1,7 +1,7 @@
 package ifsp.edu.br.IFBANK.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import ifsp.edu.br.IFBANK.model.enums.StatusEmprestimo;
@@ -50,13 +50,13 @@ public class Emprestimo {
     private StatusEmprestimo status = StatusEmprestimo.SIMULADO;
 
     @Column(name = "data_solicitacao")
-    private LocalDate dataSolicitacao = LocalDate.now();
+    private LocalDateTime dataSolicitacao = LocalDateTime.now();
 
     @Column(name = "data_aprovacao")
-    private LocalDate dataAprovacao;
+    private LocalDateTime dataAprovacao;
 
     @Column(name = "data_ultimo_pagamento")
-    private LocalDate dataUltimoPagamento;
+    private LocalDateTime dataUltimoPagamento;
 
     @OneToMany(mappedBy = "emprestimo", cascade = CascadeType.ALL)
     private List<ParcelaEmprestimo> parcelasEmprestimo;
@@ -109,27 +109,27 @@ public class Emprestimo {
 		this.status = status;
 	}
 
-	public LocalDate getDataSolicitacao() {
+	public LocalDateTime getDataSolicitacao() {
 		return dataSolicitacao;
 	}
 
-	public void setDataSolicitacao(LocalDate dataSolicitacao) {
+	public void setDataSolicitacao(LocalDateTime dataSolicitacao) {
 		this.dataSolicitacao = dataSolicitacao;
 	}
 
-	public LocalDate getDataAprovacao() {
+	public LocalDateTime getDataAprovacao() {
 		return dataAprovacao;
 	}
 
-	public void setDataAprovacao(LocalDate dataAprovacao) {
+	public void setDataAprovacao(LocalDateTime dataAprovacao) {
 		this.dataAprovacao = dataAprovacao;
 	}
 
-	public LocalDate getDataUltimoPagamento() {
+	public LocalDateTime getDataUltimoPagamento() {
 		return dataUltimoPagamento;
 	}
 
-	public void setDataUltimoPagamento(LocalDate dataUltimoPagamento) {
+	public void setDataUltimoPagamento(LocalDateTime dataUltimoPagamento) {
 		this.dataUltimoPagamento = dataUltimoPagamento;
 	}
 
