@@ -1,11 +1,11 @@
 package ifsp.edu.br.IFBANK.model;
 
-
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import ifsp.edu.br.IFBANK.model.enums.StatusConta;
 import ifsp.edu.br.IFBANK.model.enums.TipoConta;
 
 @Entity
@@ -33,6 +33,10 @@ public class Conta {
     @Column(length = 20)
     private TipoConta tipo = TipoConta.CLIENTE;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private StatusConta status = StatusConta.PENDENTE;
+
     @Column(name = "data_criacao", updatable = false)
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
@@ -48,96 +52,99 @@ public class Conta {
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
     private List<Emprestimo> emprestimos;
 
-    
-    
-	public Integer getId() {
-		return id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public Integer getAgencia() {
-		return agencia;
-	}
+    public Integer getAgencia() {
+        return agencia;
+    }
 
-	public void setAgencia(Integer agencia) {
-		this.agencia = agencia;
-	}
+    public void setAgencia(Integer agencia) {
+        this.agencia = agencia;
+    }
 
-	public Integer getNumeroConta() {
-		return numeroConta;
-	}
+    public Integer getNumeroConta() {
+        return numeroConta;
+    }
 
-	public void setNumeroConta(Integer numeroConta) {
-		this.numeroConta = numeroConta;
-	}
+    public void setNumeroConta(Integer numeroConta) {
+        this.numeroConta = numeroConta;
+    }
 
-	public Usuario getUsuario() {
-		return usuario;
-	}
+    public Usuario getUsuario() {
+        return usuario;
+    }
 
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
-	public BigDecimal getSaldo() {
-		return saldo;
-	}
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
 
-	public void setSaldo(BigDecimal saldo) {
-		this.saldo = saldo;
-	}
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
 
-	public TipoConta getTipo() {
-		return tipo;
-	}
+    public TipoConta getTipo() {
+        return tipo;
+    }
 
-	public void setTipo(TipoConta tipo) {
-		this.tipo = tipo;
-	}
+    public void setTipo(TipoConta tipo) {
+        this.tipo = tipo;
+    }
 
-	public LocalDateTime getDataCriacao() {
-		return dataCriacao;
-	}
+    public StatusConta getStatus() {
+        return status;
+    }
 
-	public void setDataCriacao(LocalDateTime dataCriacao) {
-		this.dataCriacao = dataCriacao;
-	}
+    public void setStatus(StatusConta status) {
+        this.status = status;
+    }
 
-	public List<Movimentacao> getMovimentacoesEnviadas() {
-		return movimentacoesEnviadas;
-	}
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
 
-	public void setMovimentacoesEnviadas(List<Movimentacao> movimentacoesEnviadas) {
-		this.movimentacoesEnviadas = movimentacoesEnviadas;
-	}
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
 
-	public List<Movimentacao> getMovimentacoesRecebidas() {
-		return movimentacoesRecebidas;
-	}
+    public List<Movimentacao> getMovimentacoesEnviadas() {
+        return movimentacoesEnviadas;
+    }
 
-	public void setMovimentacoesRecebidas(List<Movimentacao> movimentacoesRecebidas) {
-		this.movimentacoesRecebidas = movimentacoesRecebidas;
-	}
+    public void setMovimentacoesEnviadas(List<Movimentacao> movimentacoesEnviadas) {
+        this.movimentacoesEnviadas = movimentacoesEnviadas;
+    }
 
-	public List<Investimento> getInvestimentos() {
-		return investimentos;
-	}
+    public List<Movimentacao> getMovimentacoesRecebidas() {
+        return movimentacoesRecebidas;
+    }
 
-	public void setInvestimentos(List<Investimento> investimentos) {
-		this.investimentos = investimentos;
-	}
+    public void setMovimentacoesRecebidas(List<Movimentacao> movimentacoesRecebidas) {
+        this.movimentacoesRecebidas = movimentacoesRecebidas;
+    }
 
-	public List<Emprestimo> getEmprestimos() {
-		return emprestimos;
-	}
+    public List<Investimento> getInvestimentos() {
+        return investimentos;
+    }
 
-	public void setEmprestimos(List<Emprestimo> emprestimos) {
-		this.emprestimos = emprestimos;
-	}
-    
-    
-    
+    public void setInvestimentos(List<Investimento> investimentos) {
+        this.investimentos = investimentos;
+    }
+
+    public List<Emprestimo> getEmprestimos() {
+        return emprestimos;
+    }
+
+    public void setEmprestimos(List<Emprestimo> emprestimos) {
+        this.emprestimos = emprestimos;
+    }
 }
