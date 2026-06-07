@@ -1,7 +1,7 @@
 package ifsp.edu.br.IFBANK.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import ifsp.edu.br.IFBANK.model.enums.StatusParcela;
 import jakarta.persistence.Column;
@@ -40,10 +40,10 @@ public class ParcelaEmprestimo {
     private BigDecimal valorParcela;
 
     @Column(name = "data_vencimento", nullable = false)
-    private LocalDate dataVencimento;
+    private LocalDateTime dataVencimento;
 
     @Column(name = "data_pagamento")
-    private LocalDate dataPagamento;
+    private LocalDateTime dataPagamento;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
@@ -97,19 +97,19 @@ public class ParcelaEmprestimo {
 		this.valorParcela = valorParcela;
 	}
 
-	public LocalDate getDataVencimento() {
+	public LocalDateTime getDataVencimento() {
 		return dataVencimento;
 	}
 
-	public void setDataVencimento(LocalDate dataVencimento) {
+	public void setDataVencimento(LocalDateTime dataVencimento) {
 		this.dataVencimento = dataVencimento;
 	}
 
-	public LocalDate getDataPagamento() {
+	public LocalDateTime getDataPagamento() {
 		return dataPagamento;
 	}
 
-	public void setDataPagamento(LocalDate dataPagamento) {
+	public void setDataPagamento(LocalDateTime dataPagamento) {
 		this.dataPagamento = dataPagamento;
 	}
 

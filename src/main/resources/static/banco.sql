@@ -1,8 +1,8 @@
 /* =========================================================
    TABELAS
    ========================================================= */
-create database ifbank;
-use ifbank;
+CREATE DATABASE IF NOT EXISTS ifbank;
+USE ifbank;
 
 CREATE TABLE usuarios (
     id                          INT NOT NULL PRIMARY KEY auto_increment,
@@ -51,7 +51,7 @@ CREATE TABLE investimentos (
     conta_id          INT NOT NULL,
     tipo_investimento VARCHAR(100) NOT NULL,
     valor_investido   DECIMAL(15, 2) NOT NULL,
-    data_inicio       DATE DEFAULT (CURRENT_DATE),
+    data_inicio       DATE DEFAULT NULL,
     data_fim          DATE,
     status            VARCHAR(20) DEFAULT 'ATIVO' CHECK ( status IN ( 'ATIVO', 'ENCERRADO' ) ),
     CONSTRAINT fk_invest_conta FOREIGN KEY ( conta_id ) REFERENCES contas ( id )
@@ -69,7 +69,7 @@ CREATE TABLE emprestimos (
     taxa_juros_mensal     DECIMAL(5, 2) NOT NULL,
     parcelas              INT NOT NULL,
     status                VARCHAR(30) DEFAULT 'SIMULADO' CHECK ( status IN ( 'SIMULADO', 'SOLICITADO', 'APROVADO', 'REJEITADO', 'EM_ANDAMENTO', 'QUITADO' ) ),
-    data_solicitacao      DATE DEFAULT (CURRENT_DATE),
+    data_solicitacao      DATE DEFAULT NULL,
     data_aprovacao        DATE,
     data_ultimo_pagamento DATE,
     CONSTRAINT fk_emprestimo_conta FOREIGN KEY ( conta_id ) REFERENCES contas ( id ),

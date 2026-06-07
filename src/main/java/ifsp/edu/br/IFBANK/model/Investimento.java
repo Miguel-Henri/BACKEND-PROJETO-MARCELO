@@ -1,7 +1,7 @@
 package ifsp.edu.br.IFBANK.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import ifsp.edu.br.IFBANK.model.enums.StatusInvestimento;
 import jakarta.persistence.Column;
@@ -34,10 +34,10 @@ public class Investimento {
     private BigDecimal valorInvestido;
 
     @Column(name = "data_inicio")
-    private LocalDate dataInicio = LocalDate.now();
+    private LocalDateTime dataInicio = LocalDateTime.now();
 
     @Column(name = "data_fim")
-    private LocalDate dataFim;
+    private LocalDateTime dataFim;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
@@ -75,19 +75,19 @@ public class Investimento {
 		this.valorInvestido = valorInvestido;
 	}
 
-	public LocalDate getDataInicio() {
+	public LocalDateTime getDataInicio() {
 		return dataInicio;
 	}
 
-	public void setDataInicio(LocalDate dataInicio) {
+	public void setDataInicio(LocalDateTime dataInicio) {
 		this.dataInicio = dataInicio;
 	}
 
-	public LocalDate getDataFim() {
+	public LocalDateTime getDataFim() {
 		return dataFim;
 	}
 
-	public void setDataFim(LocalDate dataFim) {
+	public void setDataFim(LocalDateTime dataFim) {
 		this.dataFim = dataFim;
 	}
 
