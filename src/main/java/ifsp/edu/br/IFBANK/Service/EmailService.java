@@ -5,10 +5,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender = null;
+    private final JavaMailSender mailSender;
+
+    // ← Construtor para o Spring injetar
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendPasswordResetToken(String toEmail, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
