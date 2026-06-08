@@ -34,7 +34,9 @@ public class UsuarioController {
     public ResponseEntity<String> criarUser(@RequestBody Usuario usuario) {
         try {
             usuarioService.criar(usuario);
-            return ResponseEntity.status(201).body("Cadastro realizado com sucesso. Aguarde a aprovação do gerente.");
+            return ResponseEntity
+                    .status(201)
+                    .body("Cadastro realizado com sucesso. Aguarde a aprovação do gerente.");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(409).body("E-mail já cadastrado.");
         } catch (Exception e) {
@@ -59,7 +61,7 @@ public class UsuarioController {
      * Atualiza dados pessoais do usuário (nome, e-mail, telefone, endereço).
      * PATCH /api/usuarios/{id}
      *
-     * Body JSON (apenas os campos que deseja alterar):
+     * Body JSON:
      * { "telefone": "11999999999", "endereco": "Rua X, 100" }
      */
     @PatchMapping("/{id}")
@@ -80,8 +82,8 @@ public class UsuarioController {
      * Body JSON:
      * { "email": "usuario@email.com", "senha": "minhasenha" }
      *
-     * Retorna os dados do usuário e suas contas (incluindo tipo: CLIENTE ou GERENTE).
-     * O frontend usa o campo "tipo" para redirecionar para a tela correta.
+     * Retorna os dados do usuário e suas contas, incluindo o tipo:
+     * CLIENTE ou GERENTE.
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credenciais) {
@@ -90,17 +92,15 @@ public class UsuarioController {
             String senha = credenciais.get("senha");
 
             if (email == null || senha == null) {
-                return ResponseEntity.badRequest().body("E-mail e senha são obrigatórios");
+                return ResponseEntity.badRequest().body("E-mail e senha são obrigatórios.");
             }
 
             Map<String, Object> resposta = usuarioService.login(email, senha);
             return ResponseEntity.ok(resposta);
 
         } catch (IllegalArgumentException e) {
-            // E-mail ou senha inválidos — retorna 401 sem revelar qual dos dois está errado
             return ResponseEntity.status(401).body(e.getMessage());
         } catch (IllegalStateException e) {
-            // Conta ainda não aprovada
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }

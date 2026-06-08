@@ -12,8 +12,7 @@ import java.util.UUID;
 public class UploadController {
 
     @PostMapping
-    public ResponseEntity<String> upload(
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) {
 
         try {
 
@@ -30,8 +29,7 @@ public class UploadController {
                     + file.getOriginalFilename();
 
             // caminho final
-            Path caminhoArquivo =
-                    pastaUpload.resolve(nomeArquivo);
+            Path caminhoArquivo = pastaUpload.resolve(nomeArquivo);
 
             // salva arquivo
             Files.copy(
@@ -40,9 +38,7 @@ public class UploadController {
                     StandardCopyOption.REPLACE_EXISTING
             );
 
-            return ResponseEntity.ok(
-                    "Imagem salva: " + nomeArquivo
-            );
+            return ResponseEntity.ok("uploads/" + nomeArquivo);
 
         } catch (Exception e) {
 

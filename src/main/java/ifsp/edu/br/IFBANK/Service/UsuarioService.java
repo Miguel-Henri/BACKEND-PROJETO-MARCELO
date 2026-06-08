@@ -30,54 +30,58 @@ public class UsuarioService {
 
     public Usuario buscarPorId(Integer id) {
         return repository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
     }
 
     public Usuario atualizar(Integer id, Map<String, String> dados) {
         Usuario usuario = repository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
-        if (dados.containsKey("email"))    usuario.setEmail(dados.get("email"));
-        if (dados.containsKey("telefone")) usuario.setTelefone(dados.get("telefone"));
-        if (dados.containsKey("endereco")) usuario.setEndereco(dados.get("endereco"));
-        if (dados.containsKey("nome"))     usuario.setNome(dados.get("nome"));
+        if (dados.containsKey("email")) {
+            usuario.setEmail(dados.get("email"));
+        }
+
+        if (dados.containsKey("telefone")) {
+            usuario.setTelefone(dados.get("telefone"));
+        }
+
+        if (dados.containsKey("endereco")) {
+            usuario.setEndereco(dados.get("endereco"));
+        }
+
+        if (dados.containsKey("nome")) {
+            usuario.setNome(dados.get("nome"));
+        }
 
         return repository.save(usuario);
     }
 
     /**
-     * Login simples por e-mail e senha (sem Spring Security).
+     * Login simples por e-mail e senha.
      *
-     * Retorna um mapa com os dados do usuário e das suas contas,
-     * incluindo o tipo (CLIENTE ou GERENTE) para que o frontend
-     * saiba para qual tela redirecionar.
-     *
-     * ATENÇÃO: em produção, a senha deve ser armazenada com hash (BCrypt).
-     * Aqui a comparação é direta por ser um projeto acadêmico.
+     * Retorna os dados do usuário e das suas contas,
+     * incluindo o tipo CLIENTE ou GERENTE para o frontend redirecionar.
      */
     public Map<String, Object> login(String email, String senha) {
         Usuario usuario = repository.findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("E-mail ou senha inválidos"));
+                .orElseThrow(() -> new IllegalArgumentException("E-mail ou senha inválidos"));
 
         if (!usuario.getSenha().equals(senha)) {
             throw new IllegalArgumentException("E-mail ou senha inválidos");
         }
 
-        // Busca as contas associadas ao usuário
         List<Conta> contas = contaRepository.findAll()
-            .stream()
-            .filter(c -> c.getUsuario() != null && c.getUsuario().getId().equals(usuario.getId()))
-            .toList();
+                .stream()
+                .filter(c -> c.getUsuario() != null && c.getUsuario().getId().equals(usuario.getId()))
+                .toList();
 
-        // Verifica se alguma conta está ativa (necessário para liberar o login)
         boolean temContaAtiva = contas.stream()
-            .anyMatch(c -> c.getStatus() == StatusConta.ATIVA);
+                .anyMatch(c -> c.getStatus() == StatusConta.ATIVA);
 
         if (!temContaAtiva && !contas.isEmpty()) {
             throw new IllegalStateException("Sua conta ainda não foi aprovada pelo gerente");
         }
 
-        // Monta a resposta com os dados relevantes para o frontend
         Map<String, Object> resposta = new HashMap<>();
         resposta.put("usuarioId", usuario.getId());
         resposta.put("nome", usuario.getNome());
@@ -87,16 +91,15 @@ public class UsuarioService {
         resposta.put("fotoPerfil", usuario.getFotoPerfil());
         resposta.put("status", usuario.getStatus());
 
-        // Inclui lista resumida das contas (id, numeroConta, tipo, status)
         List<Map<String, Object>> contasResumo = contas.stream().map(c -> {
-            Map<String, Object> mc = new HashMap<>();
-            mc.put("contaId", c.getId());
-            mc.put("numeroConta", c.getNumeroConta());
-            mc.put("agencia", c.getAgencia());
-            mc.put("tipo", c.getTipo());
-            mc.put("status", c.getStatus());
-            mc.put("saldo", c.getSaldo());
-            return mc;
+            Map<String, Object> contaResumo = new HashMap<>();
+            contaResumo.put("contaId", c.getId());
+            contaResumo.put("numeroConta", c.getNumeroConta());
+            contaResumo.put("agencia", c.getAgencia());
+            contaResumo.put("tipo", c.getTipo());
+            contaResumo.put("status", c.getStatus());
+            contaResumo.put("saldo", c.getSaldo());
+            return contaResumo;
         }).toList();
 
         resposta.put("contas", contasResumo);
