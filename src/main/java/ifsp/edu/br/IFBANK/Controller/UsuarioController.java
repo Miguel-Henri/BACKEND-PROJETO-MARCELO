@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ifsp.edu.br.IFBANK.Service.ContaService;
 import ifsp.edu.br.IFBANK.Service.UsuarioService;
 import ifsp.edu.br.IFBANK.model.Usuario;
 
@@ -20,10 +21,12 @@ import ifsp.edu.br.IFBANK.model.Usuario;
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
+    private final ContaService contaService;
     private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService,ContaService contaService) {
         this.usuarioService = usuarioService;
+        this.contaService = contaService;
     }
 
     /**
@@ -34,9 +37,8 @@ public class UsuarioController {
     public ResponseEntity<String> criarUser(@RequestBody Usuario usuario) {
         try {
             usuarioService.criar(usuario);
-            return ResponseEntity
-                    .status(201)
-                    .body("Cadastro realizado com sucesso. Aguarde a aprovação do gerente.");
+            contaService.criar(usuario);
+            return ResponseEntity.status(201).build();
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(409).body("E-mail já cadastrado.");
         } catch (Exception e) {
