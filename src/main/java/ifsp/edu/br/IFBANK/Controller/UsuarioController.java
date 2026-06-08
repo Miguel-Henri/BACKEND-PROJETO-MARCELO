@@ -29,6 +29,10 @@ public class UsuarioController {
         this.contaService = contaService;
     }
 
+    /**
+     * Cadastra um novo usuário (abertura de conta).
+     * POST /api/usuarios/novo
+     */
     @PostMapping("/novo")
     public ResponseEntity<String> criarUser(@RequestBody Usuario usuario) {
         try {
@@ -42,6 +46,10 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Busca um usuário pelo ID.
+     * GET /api/usuarios/{id}
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscar(@PathVariable Integer id) {
         try {
@@ -51,6 +59,13 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Atualiza dados pessoais do usuário (nome, e-mail, telefone, endereço).
+     * PATCH /api/usuarios/{id}
+     *
+     * Body JSON:
+     * { "telefone": "11999999999", "endereco": "Rua X, 100" }
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody Map<String, String> dados) {
         try {
@@ -59,6 +74,36 @@ public class UsuarioController {
             return ResponseEntity.notFound().build();
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(409).body("E-mail já em uso.");
+        }
+    }
+
+    /**
+     * Realiza o login do usuário.
+     * POST /api/usuarios/login
+     *
+     * Body JSON:
+     * { "email": "usuario@email.com", "senha": "minhasenha" }
+     *
+     * Retorna os dados do usuário e suas contas, incluindo o tipo:
+     * CLIENTE ou GERENTE.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciais) {
+        try {
+            String email = credenciais.get("email");
+            String senha = credenciais.get("senha");
+
+            if (email == null || senha == null) {
+                return ResponseEntity.badRequest().body("E-mail e senha são obrigatórios.");
+            }
+
+            Map<String, Object> resposta = usuarioService.login(email, senha);
+            return ResponseEntity.ok(resposta);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
         }
     }
 }

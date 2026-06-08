@@ -29,8 +29,7 @@ public class UploadController {
                     + file.getOriginalFilename();
 
             // caminho final
-            Path caminhoArquivo =
-                    pastaUpload.resolve(nomeArquivo);
+            Path caminhoArquivo = pastaUpload.resolve(nomeArquivo);
 
             // salva arquivo
             Files.copy(
@@ -39,9 +38,7 @@ public class UploadController {
                     StandardCopyOption.REPLACE_EXISTING
             );
 
-            return ResponseEntity.ok(
-                    "uploads/" + nomeArquivo
-            );
+            return ResponseEntity.ok("uploads/" + nomeArquivo);
 
         } catch (Exception e) {
 
