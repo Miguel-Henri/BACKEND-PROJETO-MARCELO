@@ -16,6 +16,7 @@ import ifsp.edu.br.IFBANK.model.DepositoRequest;
 import ifsp.edu.br.IFBANK.model.Movimentacao;
 import ifsp.edu.br.IFBANK.model.MovimentacaoDTO;
 import ifsp.edu.br.IFBANK.model.TransferenciaRequest;
+import ifsp.edu.br.IFBANK.model.Usuario;
 import ifsp.edu.br.IFBANK.model.enums.StatusMovimentacao;
 import ifsp.edu.br.IFBANK.model.enums.TipoMovimentacao;
 
@@ -28,6 +29,17 @@ public class ContaService {
     public ContaService(ContaRepository contaRepository, MovimentacaoRepository movimentacaoRepository) {
         this.contaRepository = contaRepository;
         this.movimentacaoRepository = movimentacaoRepository;
+    }
+
+
+
+    public void criar(Usuario usuario) {
+
+        Conta conta = new Conta();
+        conta.setUsuario(usuario);
+        conta.setAgencia(5); // ← agência predefinida
+        conta.setNumeroConta(10000+usuario.getId());
+        contaRepository.save(conta);
     }
 
     @Transactional
