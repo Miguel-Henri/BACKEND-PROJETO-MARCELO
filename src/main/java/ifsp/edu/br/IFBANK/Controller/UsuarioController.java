@@ -87,7 +87,7 @@ public class UsuarioController {
      * Retorna os dados do usuário e suas contas, incluindo o tipo:
      * CLIENTE ou GERENTE.
      */
-    @PostMapping("/login")
+   /*  @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credenciais) {
         try {
             String email = credenciais.get("email");
@@ -106,4 +106,6 @@ public class UsuarioController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
+        
+}*/
 }

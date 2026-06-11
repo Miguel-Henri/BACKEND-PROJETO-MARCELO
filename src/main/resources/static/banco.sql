@@ -11,6 +11,7 @@ CREATE TABLE usuarios (
     senha                       VARCHAR(255) NOT NULL,
     telefone                    VARCHAR(20),
     endereco                    VARCHAR(50),
+    tipoConta                   VARCHAR(20) DEFAULT 'CLIENTE' CHECK ( tipoConta IN ( 'GERENTE', 'CLIENTE' ) ),
     foto_perfil 				VARCHAR(500),
     status                      VARCHAR(20) DEFAULT 'BLOQUEADO' CHECK ( status IN ( 'ATIVO', 'INATIVO', 'BLOQUEADO' ) ),
     data_criacao                TIMESTAMP DEFAULT current_timestamp,

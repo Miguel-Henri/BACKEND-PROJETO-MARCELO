@@ -27,5 +27,3 @@ INSERT INTO parcelas_emprestimo (emprestimo_id, numero_parcela, valor_amortizaca
 INSERT INTO investimentos (conta_id, tipo_investimento, valor_investido, status) VALUES
   (1, 'CDB', 1000.00, 'ATIVO');
 
-INSERT INTO tokens_recuperacao (usuario_id, token, data_expiracao, utilizado) VALUES
-  (2, 'abc123token456def789ghi', DATE_ADD(NOW(), INTERVAL 24 HOUR), 0);

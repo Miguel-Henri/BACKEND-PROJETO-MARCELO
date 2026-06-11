@@ -10,14 +10,14 @@ import ifsp.edu.br.IFBANK.model.Usuario;
 import jakarta.transaction.Transactional;
 
 @Service
-public class PasswordResetService {
+public class LoginService {
 
     private final ResetTokenRepository tokenRepository;
     private final UsuarioRepository userRepository;
     private final EmailService emailService;
 
     // ← Construtor adicionado
-    public PasswordResetService(ResetTokenRepository tokenRepository,
+    public LoginService(ResetTokenRepository tokenRepository,
                                 UsuarioRepository userRepository,
                                 EmailService emailService) {
         this.tokenRepository = tokenRepository;
@@ -58,5 +58,9 @@ public void requestReset(String email) {
         user.setSenha(newPassword);
         userRepository.save(user);
         tokenRepository.delete(resetToken);
+    }
+
+    public void login(String email,String senha){
+        
     }
 }
