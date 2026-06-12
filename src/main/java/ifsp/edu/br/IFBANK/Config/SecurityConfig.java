@@ -9,11 +9,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
@@ -35,11 +39,12 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/api/gerente/**").hasRole("GERENTE")
-                .requestMatchers("/api/**").hasAnyRole("GERENTE", "USUARIO")
-                .anyRequest().authenticated()
-            )
+            .requestMatchers("/api/auth/login").permitAll()
+            .requestMatchers("/api/usuarios/novo/**").permitAll()
+            .requestMatchers("/api/gerente/**").hasRole("GERENTE")
+            .requestMatchers("/api/**").hasAnyRole("GERENTE", "USUARIO")
+            .anyRequest().authenticated()
+        )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -50,7 +55,7 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
         return provider;
     }
 

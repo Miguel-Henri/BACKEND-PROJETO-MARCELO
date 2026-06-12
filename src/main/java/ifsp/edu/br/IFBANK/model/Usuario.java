@@ -63,8 +63,8 @@ public class Usuario implements UserDetails {
     private List<Conta> contas;
 
     @Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private TipoConta role;
+	@Column
+	private TipoConta role = TipoConta.CLIENTE;
     
     
     @PreUpdate
@@ -172,8 +172,7 @@ public class Usuario implements UserDetails {
 
 		@Override
 		public String getPassword() {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'getPassword'");
+			return senha;
 		}
 
 
@@ -181,7 +180,6 @@ public class Usuario implements UserDetails {
 
 		@Override
 		public String getUsername() {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
+			return email;
 		}
 }

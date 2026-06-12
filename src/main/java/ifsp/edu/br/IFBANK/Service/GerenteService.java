@@ -31,7 +31,7 @@ public class GerenteService {
         Conta contaGerente = contaRepository.findById(gerenteContaId)
             .orElseThrow(() -> new NoSuchElementException("Conta do gerente não encontrada"));
 
-        if (contaGerente.getTipo() != TipoConta.GERENTE) {
+        if (contaGerente.getRole() != TipoConta.GERENTE) {
             throw new SecurityException("Acesso negado: a conta informada não possui perfil de gerente");
         }
 
@@ -74,7 +74,7 @@ public class GerenteService {
         Conta conta = contaRepository.findById(request.getContaId())
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada: id " + request.getContaId()));
 
-        if (conta.getTipo() == TipoConta.GERENTE) {
+        if (conta.getRole() == TipoConta.GERENTE) {
             throw new IllegalArgumentException("Não é possível alterar o status de uma conta gerente por esta operação");
         }
 
