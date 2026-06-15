@@ -1,14 +1,12 @@
 package ifsp.edu.br.IFBANK.Controller;
 
-import java.util.NoSuchElementException;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,106 +27,44 @@ public class GerenteController {
         this.gerenteService = gerenteService;
     }
 
-    /**
-     * Lista contas de clientes com status PENDENTE (aguardando aprovação).
-     *
-     * GET /api/gerente/contas/pendentes?page=0&size=10
-     *
-     * Header obrigatório: X-Gerente-Conta-Id → ID da conta do gerente logado.
-     */
+    /** GET /api/gerente/contas/pendentes */
     @GetMapping("/contas/pendentes")
-    public ResponseEntity<?> listarPendentes(
+    public ResponseEntity<Page<ContaResumoDTO>> listarPendentes(
         @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        try {
-            Page<ContaResumoDTO> resultado = gerenteService.listarContasPendentes(
-                gerenteContaId,
-                PageRequest.of(page, size, Sort.by("dataCriacao").ascending())
-            );
-            return ResponseEntity.ok(resultado);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
-        }
+        return ResponseEntity.ok(gerenteService.listarContasPendentes(
+            gerenteContaId, PageRequest.of(page, size, Sort.by("dataCriacao").ascending())));
     }
 
-    /**
-     * Lista todas as contas de clientes (visão geral do gerente).
-     *
-     * GET /api/gerente/contas?page=0&size=10
-     *
-     * Header obrigatório: X-Gerente-Conta-Id → ID da conta do gerente logado.
-     */
+    /** GET /api/gerente/contas */
     @GetMapping("/contas")
-    public ResponseEntity<?> listarTodas(
+    public ResponseEntity<Page<ContaResumoDTO>> listarTodas(
         @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        try {
-            Page<ContaResumoDTO> resultado = gerenteService.listarTodasContas(
-                gerenteContaId,
-                PageRequest.of(page, size, Sort.by("dataCriacao").descending())
-            );
-            return ResponseEntity.ok(resultado);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
-        }
+        return ResponseEntity.ok(gerenteService.listarTodasContas(
+            gerenteContaId, PageRequest.of(page, size, Sort.by("dataCriacao").descending())));
     }
 
-    /**
-     * Busca os detalhes de uma conta específica.
-     *
-     * GET /api/gerente/contas/{contaId}
-     *
-     * Header obrigatório: X-Gerente-Conta-Id → ID da conta do gerente logado.
-     */
+    /** GET /api/gerente/contas/{contaId} */
     @GetMapping("/contas/{contaId}")
-    public ResponseEntity<?> buscarConta(
+    public ResponseEntity<ContaResumoDTO> buscarConta(
         @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
         @PathVariable Integer contaId
     ) {
-        try {
-            ContaResumoDTO dto = gerenteService.buscarConta(gerenteContaId, contaId);
-            return ResponseEntity.ok(dto);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
-        }
+        return ResponseEntity.ok(gerenteService.buscarConta(gerenteContaId, contaId));
     }
 
-    /**
-     * Aprova ou rejeita a abertura de uma conta.
-     *
-     * PATCH /api/gerente/contas/acao
-     *
-     * Body JSON:
-     * {
-     *   "contaId": 5,
-     *   "gerenteContaId": 1,
-     *   "acao": "APROVAR"   ← ou "REJEITAR"
-     * }
-     */
+    /** PATCH /api/gerente/contas/acao */
     @PatchMapping("/contas/acao")
     public ResponseEntity<String> processarConta(@RequestBody GerenteAcaoRequest request) {
-        try {
-            gerenteService.processarConta(request);
-            String msg = "APROVAR".equalsIgnoreCase(request.getAcao())
-                ? "Conta aprovada com sucesso"
-                : "Conta rejeitada com sucesso";
-            return ResponseEntity.ok(msg);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.unprocessableEntity().body(e.getMessage());
-        }
+        gerenteService.processarConta(request);
+        String msg = "APROVAR".equalsIgnoreCase(request.getAcao())
+            ? "Conta aprovada com sucesso"
+            : "Conta rejeitada com sucesso";
+        return ResponseEntity.ok(msg);
     }
 }

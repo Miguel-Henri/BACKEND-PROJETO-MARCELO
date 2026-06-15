@@ -1,9 +1,7 @@
 package ifsp.edu.br.IFBANK.Controller;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,89 +19,41 @@ import ifsp.edu.br.IFBANK.model.Usuario;
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
-    private final ContaService contaService;
+    private final ContaService   contaService;
     private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService usuarioService,ContaService contaService) {
+    public UsuarioController(UsuarioService usuarioService, ContaService contaService) {
         this.usuarioService = usuarioService;
-        this.contaService = contaService;
+        this.contaService   = contaService;
     }
 
-    /**
-     * Cadastra um novo usuário (abertura de conta).
-     * POST /api/usuarios/novo
-     */
+    /** POST /api/usuarios/novo */
     @PostMapping("/novo")
-    public ResponseEntity<String> criarUser(@RequestBody Usuario usuario) {
-        try {
-            usuarioService.criar(usuario);
-            contaService.criar(usuario);
-            return ResponseEntity.status(201).build();
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(409).body("E-mail já cadastrado.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Erro ao cadastrar usuário.");
-        }
+    public ResponseEntity<Void> criarUser(@RequestBody Usuario usuario) {
+        usuarioService.criar(usuario);
+        contaService.criar(usuario);
+        return ResponseEntity.status(201).build();
     }
 
-    /**
-     * Busca um usuário pelo ID.
-     * GET /api/usuarios/{id}
-     */
+    /** GET /api/usuarios/{id} */
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscar(@PathVariable Integer id) {
-        try {
-            return ResponseEntity.ok(usuarioService.buscarPorId(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
-    /**
-     * Atualiza dados pessoais do usuário (nome, e-mail, telefone, endereço).
-     * PATCH /api/usuarios/{id}
-     *
-     * Body JSON:
-     * { "telefone": "11999999999", "endereco": "Rua X, 100" }
-     */
+    /** PATCH /api/usuarios/{id} */
     @PatchMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody Map<String, String> dados) {
-        try {
-            return ResponseEntity.ok(usuarioService.atualizar(id, dados));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(409).body("E-mail já em uso.");
-        }
+    public ResponseEntity<Usuario> atualizar(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> dados) {
+        return ResponseEntity.ok(usuarioService.atualizar(id, dados));
     }
 
-    /**
-     * Realiza o login do usuário.
-     * POST /api/usuarios/login
-     *
-     * Body JSON:
-     * { "email": "usuario@email.com", "senha": "minhasenha" }
-     *
-     * Retorna os dados do usuário e suas contas, incluindo o tipo:
-     * CLIENTE ou GERENTE.
-     */
+    /** POST /api/usuarios/login */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciais) {
-        try {
-            String email = credenciais.get("email");
-            String senha = credenciais.get("senha");
-
-            if (email == null || senha == null) {
-                return ResponseEntity.badRequest().body("E-mail e senha são obrigatórios.");
-            }
-
-            Map<String, Object> resposta = usuarioService.login(email, senha);
-            return ResponseEntity.ok(resposta);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
-        }
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credenciais) {
+        String email = credenciais.get("email");
+        String senha = credenciais.get("senha");
+        return ResponseEntity.ok(usuarioService.login(email, senha));
     }
 }

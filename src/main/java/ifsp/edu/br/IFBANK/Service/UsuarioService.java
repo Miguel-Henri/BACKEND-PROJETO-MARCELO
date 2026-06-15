@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import ifsp.edu.br.IFBANK.Exception.CredenciaisInvalidasException;
+
 import ifsp.edu.br.IFBANK.Repository.ContaRepository;
 import ifsp.edu.br.IFBANK.Repository.UsuarioRepository;
 import ifsp.edu.br.IFBANK.model.Conta;
@@ -63,11 +65,14 @@ public class UsuarioService {
      * incluindo o tipo CLIENTE ou GERENTE para o frontend redirecionar.
      */
     public Map<String, Object> login(String email, String senha) {
+        if (email == null || senha == null) {
+            throw new CredenciaisInvalidasException("E-mail e senha são obrigatórios.");
+        }
         Usuario usuario = repository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("E-mail ou senha inválidos"));
+                .orElseThrow(() -> new CredenciaisInvalidasException("E-mail ou senha inválidos."));
 
         if (!usuario.getSenha().equals(senha)) {
-            throw new IllegalArgumentException("E-mail ou senha inválidos");
+            throw new CredenciaisInvalidasException("E-mail ou senha inválidos.");
         }
 
         List<Conta> contas = contaRepository.findAll()
