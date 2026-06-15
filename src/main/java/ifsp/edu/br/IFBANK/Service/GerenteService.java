@@ -31,7 +31,7 @@ public class GerenteService {
         Conta contaGerente = contaRepository.findById(gerenteContaId)
             .orElseThrow(() -> new NoSuchElementException("Conta do gerente não encontrada"));
 
-        if (contaGerente.getTipo() != TipoConta.GERENTE) {
+        if (contaGerente.getRole() != TipoConta.GERENTE) {
             throw new SecurityException("Acesso negado: a conta informada não possui perfil de gerente");
         }
 
@@ -44,10 +44,9 @@ public class GerenteService {
      * Lista todas as contas de clientes com status PENDENTE (aguardando aprovação).
      * Ordenadas pela data de criação mais antiga primeiro.
      */
-    public Page<ContaResumoDTO> listarContasPendentes(Integer gerenteContaId, Pageable pageable) {
-        validarGerente(gerenteContaId);
+    public Page<ContaResumoDTO> listarContasPendentes( Pageable pageable) {
         return contaRepository
-            .findByStatusAndTipo(StatusConta.PENDENTE, TipoConta.CLIENTE, pageable)
+            .findByStatusAndRole(StatusConta.PENDENTE, TipoConta.CLIENTE, pageable)
             .map(ContaResumoDTO::from);
     }
 
@@ -55,10 +54,9 @@ public class GerenteService {
      * Lista todas as contas de clientes independente do status.
      * Útil para o gerente ter uma visão geral de todos os clientes.
      */
-    public Page<ContaResumoDTO> listarTodasContas(Integer gerenteContaId, Pageable pageable) {
-        validarGerente(gerenteContaId);
+    public Page<ContaResumoDTO> listarTodasContas( Pageable pageable) {
         return contaRepository
-            .findByTipo(TipoConta.CLIENTE, pageable)
+            .findByRole(TipoConta.CLIENTE, pageable)
             .map(ContaResumoDTO::from);
     }
 
@@ -74,7 +72,7 @@ public class GerenteService {
         Conta conta = contaRepository.findById(request.getContaId())
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada: id " + request.getContaId()));
 
-        if (conta.getTipo() == TipoConta.GERENTE) {
+        if (conta.getRole() == TipoConta.GERENTE) {
             throw new IllegalArgumentException("Não é possível alterar o status de uma conta gerente por esta operação");
         }
 
@@ -106,8 +104,8 @@ public class GerenteService {
     /**
      * Busca os detalhes de uma conta específica (para o gerente visualizar antes de decidir).
      */
-    public ContaResumoDTO buscarConta(Integer gerenteContaId, Integer contaId) {
-        validarGerente(gerenteContaId);
+    public ContaResumoDTO buscarConta( Integer contaId) {
+      
         Conta conta = contaRepository.findById(contaId)
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada: id " + contaId));
         return ContaResumoDTO.from(conta);

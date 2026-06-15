@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,13 +37,11 @@ public class GerenteController {
      */
     @GetMapping("/contas/pendentes")
     public ResponseEntity<?> listarPendentes(
-        @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
         try {
             Page<ContaResumoDTO> resultado = gerenteService.listarContasPendentes(
-                gerenteContaId,
                 PageRequest.of(page, size, Sort.by("dataCriacao").ascending())
             );
             return ResponseEntity.ok(resultado);
@@ -64,13 +61,11 @@ public class GerenteController {
      */
     @GetMapping("/contas")
     public ResponseEntity<?> listarTodas(
-        @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
         try {
             Page<ContaResumoDTO> resultado = gerenteService.listarTodasContas(
-                gerenteContaId,
                 PageRequest.of(page, size, Sort.by("dataCriacao").descending())
             );
             return ResponseEntity.ok(resultado);
@@ -90,11 +85,10 @@ public class GerenteController {
      */
     @GetMapping("/contas/{contaId}")
     public ResponseEntity<?> buscarConta(
-        @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
         @PathVariable Integer contaId
     ) {
         try {
-            ContaResumoDTO dto = gerenteService.buscarConta(gerenteContaId, contaId);
+            ContaResumoDTO dto = gerenteService.buscarConta(contaId);
             return ResponseEntity.ok(dto);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
