@@ -39,7 +39,7 @@ public class LoginController {
         Usuario usuario = (Usuario) authentication.getPrincipal();
 
         String token = jwtService.gerarToken(usuario);
-
+        
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }    
     
