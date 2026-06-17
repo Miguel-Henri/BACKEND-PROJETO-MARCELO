@@ -31,10 +31,6 @@ public class Conta {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private TipoConta tipo = TipoConta.CLIENTE;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
     private StatusConta status = StatusConta.PENDENTE;
 
     @Column(name = "data_criacao", updatable = false)
@@ -51,6 +47,10 @@ public class Conta {
 
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
     private List<Emprestimo> emprestimos;
+
+    @Enumerated(EnumType.STRING)
+	@Column
+	private TipoConta role = TipoConta.CLIENTE;
 
     public Integer getId() {
         return id;
@@ -92,12 +92,12 @@ public class Conta {
         this.saldo = saldo;
     }
 
-    public TipoConta getTipo() {
-        return tipo;
+    public TipoConta getRole() {
+        return role;
     }
 
-    public void setTipo(TipoConta tipo) {
-        this.tipo = tipo;
+    public void setRole(TipoConta role) {
+        this.role = role  ;
     }
 
     public StatusConta getStatus() {

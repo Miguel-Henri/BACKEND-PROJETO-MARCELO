@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import ifsp.edu.br.IFBANK.model.enums.StatusUsuario;
+import ifsp.edu.br.IFBANK.model.enums.TipoConta;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,10 +18,14 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Collection;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +62,9 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Conta> contas;
 
-    
+    @Enumerated(EnumType.STRING)
+	@Column
+	private TipoConta role = TipoConta.CLIENTE;
     
     
     @PreUpdate
@@ -155,4 +162,24 @@ public class Usuario {
 	public void setContas(List<Conta> contas) {
 		this.contas = contas;
 	}
+
+		public Collection<? extends GrantedAuthority> getAuthorities() {
+			return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+		}
+
+
+
+
+		@Override
+		public String getPassword() {
+			return senha;
+		}
+
+
+
+
+		@Override
+		public String getUsername() {
+			return email;
+		}
 }

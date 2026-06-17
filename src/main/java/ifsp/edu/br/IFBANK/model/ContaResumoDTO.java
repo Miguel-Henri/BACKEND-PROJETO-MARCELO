@@ -36,7 +36,7 @@ public class ContaResumoDTO {
         dto.setId(conta.getId());
         dto.setNumeroConta(conta.getNumeroConta());
         dto.setAgencia(conta.getAgencia());
-        dto.setTipo(conta.getTipo());
+        dto.setTipo(conta.getRole());
         dto.setStatus(conta.getStatus());
         dto.setSaldo(conta.getSaldo());
         dto.setDataCriacao(conta.getDataCriacao());

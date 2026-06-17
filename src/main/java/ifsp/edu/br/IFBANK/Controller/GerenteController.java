@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,8 +28,7 @@ public class GerenteController {
 
     /** GET /api/gerente/contas/pendentes */
     @GetMapping("/contas/pendentes")
-    public ResponseEntity<Page<ContaResumoDTO>> listarPendentes(
-        @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
+    public ResponseEntity<?> listarPendentes(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
@@ -40,8 +38,7 @@ public class GerenteController {
 
     /** GET /api/gerente/contas */
     @GetMapping("/contas")
-    public ResponseEntity<Page<ContaResumoDTO>> listarTodas(
-        @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
+    public ResponseEntity<?> listarTodas(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
@@ -51,8 +48,7 @@ public class GerenteController {
 
     /** GET /api/gerente/contas/{contaId} */
     @GetMapping("/contas/{contaId}")
-    public ResponseEntity<ContaResumoDTO> buscarConta(
-        @RequestHeader("X-Gerente-Conta-Id") Integer gerenteContaId,
+    public ResponseEntity<?> buscarConta(
         @PathVariable Integer contaId
     ) {
         return ResponseEntity.ok(gerenteService.buscarConta(gerenteContaId, contaId));
