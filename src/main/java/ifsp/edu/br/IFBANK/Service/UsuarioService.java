@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import ifsp.edu.br.IFBANK.Exception.CredenciaisInvalidasException;
+
 import ifsp.edu.br.IFBANK.Repository.ContaRepository;
 import ifsp.edu.br.IFBANK.Repository.UsuarioRepository;
 import ifsp.edu.br.IFBANK.model.Conta;
