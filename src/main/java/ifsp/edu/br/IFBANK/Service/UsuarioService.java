@@ -1,19 +1,18 @@
 package ifsp.edu.br.IFBANK.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
-
-import ifsp.edu.br.IFBANK.Exception.CredenciaisInvalidasException;
+import org.springframework.transaction.annotation.Transactional;
 
 import ifsp.edu.br.IFBANK.Repository.ContaRepository;
 import ifsp.edu.br.IFBANK.Repository.UsuarioRepository;
 import ifsp.edu.br.IFBANK.model.Conta;
 import ifsp.edu.br.IFBANK.model.Usuario;
-import ifsp.edu.br.IFBANK.model.enums.StatusConta;
 
 @Service
 public class UsuarioService {
@@ -58,5 +57,30 @@ public class UsuarioService {
         return repository.save(usuario);
     }
 
+    @Transactional
+    public Map<String, Object> dadosSessao(Usuario usuario) {
+        List<Map<String, Object>> contas = new ArrayList<>();
+        if (usuario.getContas() != null) {
+            for (Conta conta : usuario.getContas()) {
+                Map<String, Object> contaMap = new HashMap<>();
+                contaMap.put("contaId", conta.getId());
+                contaMap.put("numeroConta", conta.getNumeroConta());
+                contaMap.put("agencia", conta.getAgencia());
+                contaMap.put("tipo", conta.getRole());
+                contaMap.put("status", conta.getStatus());
+                contaMap.put("saldo", conta.getSaldo());
+                contas.add(contaMap);
+            }
+        }
 
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("usuarioId", usuario.getId());
+        resposta.put("nome", usuario.getNome());
+        resposta.put("email", usuario.getEmail());
+        resposta.put("telefone", usuario.getTelefone());
+        resposta.put("endereco", usuario.getEndereco());
+        resposta.put("fotoPerfil", usuario.getFotoPerfil());
+        resposta.put("contas", contas);
+        return resposta;
+    }
 }

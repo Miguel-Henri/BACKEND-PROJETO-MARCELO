@@ -6,6 +6,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,15 +35,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login").permitAll()
+            .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/usuarios/novo/**").permitAll()
+            .requestMatchers("/upload").permitAll()
+            .requestMatchers("/uploads/**").permitAll()
             .requestMatchers("/api/gerente/**").hasRole("GERENTE")
-            .requestMatchers("/api/**").hasAnyRole("GERENTE", "USUARIO")
+            .requestMatchers("/api/**").hasAnyRole("GERENTE", "CLIENTE")
             .anyRequest().authenticated()
         )
             .authenticationProvider(authenticationProvider())

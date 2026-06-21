@@ -1,8 +1,12 @@
 package ifsp.edu.br.IFBANK.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +17,7 @@ import ifsp.edu.br.IFBANK.Repository.InvestimentoRepository;
 import ifsp.edu.br.IFBANK.Repository.MovimentacaoRepository;
 import ifsp.edu.br.IFBANK.model.Conta;
 import ifsp.edu.br.IFBANK.model.Investimento;
+import ifsp.edu.br.IFBANK.model.InvestimentoDTO;
 import ifsp.edu.br.IFBANK.model.InvestimentoRequest;
 import ifsp.edu.br.IFBANK.model.Movimentacao;
 import ifsp.edu.br.IFBANK.model.enums.StatusInvestimento;
@@ -21,6 +26,16 @@ import ifsp.edu.br.IFBANK.model.enums.TipoMovimentacao;
 
 @Service
 public class InvestimentoService {
+
+    private static final Map<String, BigDecimal> TAXAS_MENSAIS = Map.of(
+        "CDB", new BigDecimal("0.009"),
+        "LCI", new BigDecimal("0.008"),
+        "LCA", new BigDecimal("0.008"),
+        "TESOURO_SELIC", new BigDecimal("0.010"),
+        "TESOURO_PREFIXADO", new BigDecimal("0.011")
+    );
+
+    private static final BigDecimal TAXA_PADRAO = new BigDecimal("0.008");
 
     private final ContaRepository contaRepository;
     private final InvestimentoRepository investimentoRepository;
@@ -35,7 +50,7 @@ public class InvestimentoService {
     }
 
     @Transactional
-    public Investimento aplicar(InvestimentoRequest request) {
+    public InvestimentoDTO aplicar(InvestimentoRequest request) {
         Conta conta = contaRepository
             .findByNumeroContaAndAgencia(request.getNumeroConta(), request.getAgencia())
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada"));
@@ -75,19 +90,24 @@ public class InvestimentoService {
         investimento.setDataInicio(LocalDateTime.now());
         investimento.setStatus(StatusInvestimento.ATIVO);
 
-        return investimentoRepository.save(investimento);
+        return montarDTO(investimentoRepository.save(investimento));
     }
 
-    public List<Investimento> listar(Integer numeroConta, Integer agencia) {
+    @Transactional
+    public List<InvestimentoDTO> listar(Integer numeroConta, Integer agencia) {
         Conta conta = contaRepository
             .findByNumeroContaAndAgencia(numeroConta, agencia)
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada"));
 
-        return investimentoRepository.findByConta(conta);
+        List<InvestimentoDTO> lista = new ArrayList<>();
+        for (Investimento investimento : investimentoRepository.findByConta(conta)) {
+            lista.add(montarDTO(investimento));
+        }
+        return lista;
     }
 
     @Transactional
-    public Investimento encerrar(Integer investimentoId, Integer numeroConta, Integer agencia) {
+    public InvestimentoDTO encerrar(Integer investimentoId, Integer numeroConta, Integer agencia) {
         Conta conta = contaRepository
             .findByNumeroContaAndAgencia(numeroConta, agencia)
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada"));
@@ -100,15 +120,17 @@ public class InvestimentoService {
             throw new IllegalArgumentException("Investimento já está encerrado");
         }
 
-        // Devolve o valor investido ao saldo da conta
-        conta.setSaldo(conta.getSaldo().add(investimento.getValorInvestido()));
+        BigDecimal valorResgate = calcularValorAtual(investimento);
+
+        // Devolve o valor atual ao saldo da conta
+        conta.setSaldo(conta.getSaldo().add(valorResgate));
         contaRepository.save(conta);
 
         // Registra movimentação de retorno
         Movimentacao mov = new Movimentacao();
         mov.setContaDestino(conta);
-        mov.setValor(investimento.getValorInvestido());
-        mov.setSaldoAnterior(conta.getSaldo().subtract(investimento.getValorInvestido()));
+        mov.setValor(valorResgate);
+        mov.setSaldoAnterior(conta.getSaldo().subtract(valorResgate));
         mov.setSaldoPosterior(conta.getSaldo());
         mov.setTipo(TipoMovimentacao.INVESTIMENTO);
         mov.setDescricao("Investimento encerrado: " + investimento.getTipoInvestimento());
@@ -119,6 +141,28 @@ public class InvestimentoService {
         investimento.setStatus(StatusInvestimento.ENCERRADO);
         investimento.setDataFim(LocalDateTime.now());
 
-        return investimentoRepository.save(investimento);
+        return montarDTO(investimentoRepository.save(investimento));
+    }
+
+    private InvestimentoDTO montarDTO(Investimento investimento) {
+        BigDecimal valorAtual = calcularValorAtual(investimento);
+        BigDecimal rendimento = valorAtual.subtract(investimento.getValorInvestido());
+        return InvestimentoDTO.from(investimento, valorAtual, rendimento);
+    }
+
+    private BigDecimal calcularValorAtual(Investimento investimento) {
+        BigDecimal taxaMensal = TAXAS_MENSAIS.getOrDefault(investimento.getTipoInvestimento(), TAXA_PADRAO);
+
+        LocalDateTime inicio = investimento.getDataInicio() != null ? investimento.getDataInicio() : LocalDateTime.now();
+        LocalDateTime fim = investimento.getDataFim() != null ? investimento.getDataFim() : LocalDateTime.now();
+        long dias = ChronoUnit.DAYS.between(inicio, fim);
+        if (dias < 0) {
+            dias = 0;
+        }
+
+        BigDecimal meses = new BigDecimal(dias).divide(new BigDecimal("30"), 6, RoundingMode.HALF_UP);
+        BigDecimal fator = BigDecimal.ONE.add(taxaMensal.multiply(meses));
+
+        return investimento.getValorInvestido().multiply(fator).setScale(2, RoundingMode.HALF_UP);
     }
 }
