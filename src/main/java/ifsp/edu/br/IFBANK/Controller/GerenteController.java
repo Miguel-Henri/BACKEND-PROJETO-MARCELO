@@ -33,7 +33,7 @@ public class GerenteController {
         @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(gerenteService.listarContasPendentes(
-            gerenteContaId, PageRequest.of(page, size, Sort.by("dataCriacao").ascending())));
+            PageRequest.of(page, size, Sort.by("dataCriacao").ascending())));
     }
 
     /** GET /api/gerente/contas */
@@ -43,7 +43,7 @@ public class GerenteController {
         @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(gerenteService.listarTodasContas(
-            gerenteContaId, PageRequest.of(page, size, Sort.by("dataCriacao").descending())));
+            PageRequest.of(page, size, Sort.by("dataCriacao").descending())));
     }
 
     /** GET /api/gerente/contas/{contaId} */
@@ -51,7 +51,7 @@ public class GerenteController {
     public ResponseEntity<?> buscarConta(
         @PathVariable Integer contaId
     ) {
-        return ResponseEntity.ok(gerenteService.buscarConta(gerenteContaId, contaId));
+        return ResponseEntity.ok(gerenteService.buscarConta(contaId));
     }
 
     /** PATCH /api/gerente/contas/acao */

@@ -59,8 +59,4 @@ public void requestReset(String email) {
         userRepository.save(user);
         tokenRepository.delete(resetToken);
     }
-
-    public void login(String email,String senha){
-        
-    }
 }

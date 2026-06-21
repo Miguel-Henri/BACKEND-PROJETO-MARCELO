@@ -48,12 +48,4 @@ public class UsuarioController {
             @RequestBody Map<String, String> dados) {
         return ResponseEntity.ok(usuarioService.atualizar(id, dados));
     }
-
-    /** POST /api/usuarios/login */
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credenciais) {
-        String email = credenciais.get("email");
-        String senha = credenciais.get("senha");
-        return ResponseEntity.ok(usuarioService.login(email, senha));
-    }
 }

@@ -24,23 +24,6 @@ public class GerenteService {
     }
 
     /**
-     * Valida se a conta informada realmente pertence a um gerente.
-     * Lança exceção se não for gerente ou se a conta não existir.
-     */
-    private void validarGerente(Integer gerenteContaId) {
-        Conta contaGerente = contaRepository.findById(gerenteContaId)
-            .orElseThrow(() -> new NoSuchElementException("Conta do gerente não encontrada"));
-
-        if (contaGerente.getRole() != TipoConta.GERENTE) {
-            throw new SecurityException("Acesso negado: a conta informada não possui perfil de gerente");
-        }
-
-        if (contaGerente.getStatus() != StatusConta.ATIVA) {
-            throw new SecurityException("Acesso negado: a conta do gerente está inativa ou bloqueada");
-        }
-    }
-
-    /**
      * Lista todas as contas de clientes com status PENDENTE (aguardando aprovação).
      * Ordenadas pela data de criação mais antiga primeiro.
      */
@@ -67,8 +50,6 @@ public class GerenteService {
      */
     @Transactional
     public void processarConta(GerenteAcaoRequest request) {
-        validarGerente(request.getGerenteContaId());
-
         Conta conta = contaRepository.findById(request.getContaId())
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada: id " + request.getContaId()));
 

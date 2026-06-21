@@ -12,26 +12,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ifsp.edu.br.IFBANK.Service.InvestimentoService;
-import ifsp.edu.br.IFBANK.model.InvestimentoDTO;
-import ifsp.edu.br.IFBANK.model.InvestimentoRequest;
+import ifsp.edu.br.IFBANK.Service.EmprestimoService;
+import ifsp.edu.br.IFBANK.model.EmprestimoDTO;
+import ifsp.edu.br.IFBANK.model.EmprestimoRequest;
 
 @RestController
-@RequestMapping("/api/investimentos")
-public class InvestimentoController {
+@RequestMapping("/api/emprestimos")
+public class EmprestimoController {
 
-    private final InvestimentoService investimentoService;
+    private final EmprestimoService emprestimoService;
 
-    public InvestimentoController(InvestimentoService investimentoService) {
-        this.investimentoService = investimentoService;
+    public EmprestimoController(EmprestimoService emprestimoService) {
+        this.emprestimoService = emprestimoService;
     }
 
-    // POST /api/investimentos/aplicar
-    @PostMapping("/aplicar")
-    public ResponseEntity<?> aplicar(@RequestBody InvestimentoRequest request) {
+    // POST /api/emprestimos/solicitar
+    @PostMapping("/solicitar")
+    public ResponseEntity<?> solicitar(@RequestBody EmprestimoRequest request) {
         try {
-            InvestimentoDTO investimento = investimentoService.aplicar(request);
-            return ResponseEntity.ok(investimento);
+            EmprestimoDTO emprestimo = emprestimoService.solicitar(request);
+            return ResponseEntity.ok(emprestimo);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
@@ -39,28 +39,29 @@ public class InvestimentoController {
         }
     }
 
-    // GET /api/investimentos/listar?numeroConta=10001&agencia=5
+    // GET /api/emprestimos/listar?numeroConta=10001&agencia=5
     @GetMapping("/listar")
     public ResponseEntity<?> listar(
             @RequestParam Integer numeroConta,
             @RequestParam Integer agencia) {
         try {
-            List<InvestimentoDTO> investimentos = investimentoService.listar(numeroConta, agencia);
-            return ResponseEntity.ok(investimentos);
+            List<EmprestimoDTO> emprestimos = emprestimoService.listar(numeroConta, agencia);
+            return ResponseEntity.ok(emprestimos);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    // POST /api/investimentos/{id}/encerrar?numeroConta=10001&agencia=5
-    @PostMapping("/{id}/encerrar")
-    public ResponseEntity<?> encerrar(
+    // POST /api/emprestimos/{id}/parcelas/{parcelaId}/pagar?numeroConta=10001&agencia=5
+    @PostMapping("/{id}/parcelas/{parcelaId}/pagar")
+    public ResponseEntity<?> pagarParcela(
             @PathVariable Integer id,
+            @PathVariable Integer parcelaId,
             @RequestParam Integer numeroConta,
             @RequestParam Integer agencia) {
         try {
-            InvestimentoDTO investimento = investimentoService.encerrar(id, numeroConta, agencia);
-            return ResponseEntity.ok(investimento);
+            EmprestimoDTO emprestimo = emprestimoService.pagarParcela(id, parcelaId, numeroConta, agencia);
+            return ResponseEntity.ok(emprestimo);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {

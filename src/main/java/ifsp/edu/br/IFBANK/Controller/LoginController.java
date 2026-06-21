@@ -1,14 +1,18 @@
 package ifsp.edu.br.IFBANK.Controller;
 
 import ifsp.edu.br.IFBANK.Config.JwtService;
+import ifsp.edu.br.IFBANK.Exception.CredenciaisInvalidasException;
 import ifsp.edu.br.IFBANK.Service.LoginService;
+import ifsp.edu.br.IFBANK.Service.UsuarioService;
 import ifsp.edu.br.IFBANK.model.LoginRequestDTO;
-import ifsp.edu.br.IFBANK.model.LoginResponseDTO;
 import ifsp.edu.br.IFBANK.model.Usuario;
+
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/auth")
 public class LoginController {
-    
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -25,23 +29,31 @@ public class LoginController {
     private JwtService jwtService;
 
     private final LoginService loginService;
-        public LoginController(LoginService loginService) {
+    private final UsuarioService usuarioService;
+
+    public LoginController(LoginService loginService, UsuarioService usuarioService) {
         this.loginService = loginService;
+        this.usuarioService = usuarioService;
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> postMethodName(@RequestBody LoginRequestDTO request) {
-          Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
-        );
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
+            );
 
-        Usuario usuario = (Usuario) authentication.getPrincipal();
+            Usuario usuario = (Usuario) authentication.getPrincipal();
 
-        String token = jwtService.gerarToken(usuario);
-        
-        return ResponseEntity.ok(new LoginResponseDTO(token));
-    }    
+            Map<String, Object> resposta = usuarioService.dadosSessao(usuario);
+            resposta.put("token", jwtService.gerarToken(usuario));
+
+            return ResponseEntity.ok(resposta);
+        } catch (BadCredentialsException e) {
+            throw new CredenciaisInvalidasException("E-mail ou senha inválidos");
+        }
+    }
     
     
 

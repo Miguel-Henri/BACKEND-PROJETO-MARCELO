@@ -9,10 +9,11 @@ CREATE TABLE usuarios (
     nome                        VARCHAR(255) NOT NULL,
     email                       VARCHAR(255) UNIQUE NOT NULL,
     senha                       VARCHAR(255) NOT NULL,
-    telefone                    VARCHAR(20),
+    telefone                    VARCHAR(255),
     endereco                    VARCHAR(50),
     foto_perfil 				VARCHAR(500),
-    status                      VARCHAR(20) DEFAULT 'BLOQUEADO' CHECK ( status IN ( 'ATIVO', 'INATIVO', 'BLOQUEADO' ) ),
+    status                      VARCHAR(20) DEFAULT 'BLOQUEADO' CHECK ( status IN ( 'ATIVO', 'INATIVO', 'BLOQUEADO', 'PENDENTE' ) ),
+    role                        VARCHAR(20) DEFAULT 'CLIENTE' NOT NULL CHECK ( role IN ( 'CLIENTE', 'GERENTE' ) ),
     data_criacao                TIMESTAMP DEFAULT current_timestamp,
     data_ultima_atualizacao     TIMESTAMP DEFAULT current_timestamp
 );
@@ -23,7 +24,8 @@ CREATE TABLE contas (
     numero_conta INT NOT NULL,
     usuario_id   INT NOT NULL,
     saldo        DECIMAL(15, 2) DEFAULT 0.00,
-    tipo         VARCHAR(20) DEFAULT 'CLIENTE' CHECK ( tipo IN ( 'CLIENTE', 'GERENTE' ) ),
+    role         VARCHAR(20) DEFAULT 'CLIENTE' CHECK ( role IN ( 'CLIENTE', 'GERENTE' ) ),
+    status       VARCHAR(20) DEFAULT 'PENDENTE' CHECK ( status IN ( 'PENDENTE', 'ATIVA', 'BLOQUEADA' ) ),
     data_criacao TIMESTAMP DEFAULT current_timestamp,
     CONSTRAINT fk_contas_usuarios FOREIGN KEY ( usuario_id ) REFERENCES usuarios ( id )
 );
@@ -51,8 +53,8 @@ CREATE TABLE investimentos (
     conta_id          INT NOT NULL,
     tipo_investimento VARCHAR(100) NOT NULL,
     valor_investido   DECIMAL(15, 2) NOT NULL,
-    data_inicio       DATE DEFAULT NULL,
-    data_fim          DATE,
+    data_inicio       DATETIME(6) DEFAULT NULL,
+    data_fim          DATETIME(6),
     status            VARCHAR(20) DEFAULT 'ATIVO' CHECK ( status IN ( 'ATIVO', 'ENCERRADO' ) ),
     CONSTRAINT fk_invest_conta FOREIGN KEY ( conta_id ) REFERENCES contas ( id )
 );
@@ -69,9 +71,9 @@ CREATE TABLE emprestimos (
     taxa_juros_mensal     DECIMAL(5, 2) NOT NULL,
     parcelas              INT NOT NULL,
     status                VARCHAR(30) DEFAULT 'SIMULADO' CHECK ( status IN ( 'SIMULADO', 'SOLICITADO', 'APROVADO', 'REJEITADO', 'EM_ANDAMENTO', 'QUITADO' ) ),
-    data_solicitacao      DATE DEFAULT NULL,
-    data_aprovacao        DATE,
-    data_ultimo_pagamento DATE,
+    data_solicitacao      DATETIME(6) DEFAULT NULL,
+    data_aprovacao        DATETIME(6),
+    data_ultimo_pagamento DATETIME(6),
     CONSTRAINT fk_emprestimo_conta FOREIGN KEY ( conta_id ) REFERENCES contas ( id ),
     CONSTRAINT uk_emprestimo_duplicado UNIQUE ( conta_id, valor_emprestimo, parcelas, taxa_juros_mensal )
 );
@@ -83,8 +85,8 @@ CREATE TABLE parcelas_emprestimo (
     valor_amortizacao DECIMAL(15, 2),
     valor_juros       DECIMAL(15, 2),
     valor_parcela     DECIMAL(15, 2) NOT NULL,
-    data_vencimento   DATE NOT NULL,
-    data_pagamento    DATE,
+    data_vencimento   DATETIME(6) NOT NULL,
+    data_pagamento    DATETIME(6),
     status            VARCHAR(20) DEFAULT 'PENDENTE' CHECK ( status IN ( 'PENDENTE', 'PAGO', 'ATRASADO' ) ),
     CONSTRAINT fk_parcelas_emprestimo FOREIGN KEY ( emprestimo_id ) REFERENCES emprestimos ( id )
 );
@@ -92,10 +94,11 @@ CREATE TABLE parcelas_emprestimo (
 CREATE TABLE tokens_recuperacao (
     id           INT PRIMARY KEY auto_increment,
     usuario_id   INT NOT NULL,
+    email        VARCHAR(255) NOT NULL,
     token        VARCHAR(64) NOT NULL UNIQUE,
     data_expiracao TIMESTAMP NOT NULL,
-	utilizado TINYINT DEFAULT 0, -- 0=Não, 1=Sim
+	utilizado BIT NOT NULL DEFAULT 0,
     CONSTRAINT fk_token_user FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);	
+);
 
 COMMIT;
