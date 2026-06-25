@@ -54,6 +54,12 @@ public class UsuarioService {
             usuario.setNome(dados.get("nome"));
         }
 
+
+        if (dados.containsKey("fotoPerfil")) {
+            usuario.setFotoPerfil(dados.get("fotoPerfil"));
+        }
+        System.out.println("Atualizando usuário: " + usuario);
+        System.out.println("Dados recebidos no PATCH: " + dados);
         return repository.save(usuario);
     }
 
