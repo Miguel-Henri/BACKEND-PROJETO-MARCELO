@@ -6,6 +6,7 @@ import ifsp.edu.br.IFBANK.Service.LoginService;
 import ifsp.edu.br.IFBANK.Service.UsuarioService;
 import ifsp.edu.br.IFBANK.model.LoginRequestDTO;
 import ifsp.edu.br.IFBANK.model.Usuario;
+import ifsp.edu.br.IFBANK.model.enums.StatusUsuario;
 
 import java.util.Map;
 
@@ -37,23 +38,28 @@ public class LoginController {
     }
 
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
-            );
-
-            Usuario usuario = (Usuario) authentication.getPrincipal();
-
-            Map<String, Object> resposta = usuarioService.dadosSessao(usuario);
-            resposta.put("token", jwtService.gerarToken(usuario));
-
-            return ResponseEntity.ok(resposta);
-        } catch (BadCredentialsException e) {
-            throw new CredenciaisInvalidasException("E-mail ou senha inválidos");
-        }
+@PostMapping("/login")
+public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO request) {
+    Authentication authentication;
+    
+    try {
+        authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
+        );
+    } catch (BadCredentialsException e) {
+        throw new CredenciaisInvalidasException("E-mail ou senha inválidosaaaaa");
     }
+
+    Usuario usuario = (Usuario) authentication.getPrincipal();
+
+    if (!usuario.getStatus().equals(StatusUsuario.ATIVO)) {
+        throw new CredenciaisInvalidasException("Conta bloqueada. Entre em contato com o suporte.");
+    }
+
+    Map<String, Object> resposta = usuarioService.dadosSessao(usuario);
+    resposta.put("token", jwtService.gerarToken(usuario));
+    return ResponseEntity.ok(resposta);
+}
     
     
 
