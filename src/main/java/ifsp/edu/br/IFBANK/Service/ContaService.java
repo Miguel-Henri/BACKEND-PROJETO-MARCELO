@@ -52,6 +52,10 @@ public class ContaService {
             .findByNumeroContaAndAgencia(request.getNumeroContaDestino(), request.getAgenciaDestino())
             .orElseThrow(() -> new NoSuchElementException("Conta de destino não encontrada"));
 
+        if (contaOrigem.getId().equals(contaDestino.getId())) {
+            throw new IllegalArgumentException("Conta de origem e destino não podem ser a mesma");
+        }
+
         if (request.getValor().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor deve ser maior que zero");
         }

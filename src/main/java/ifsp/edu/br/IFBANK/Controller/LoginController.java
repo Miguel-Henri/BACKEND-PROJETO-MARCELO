@@ -47,13 +47,13 @@ public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO re
             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha())
         );
     } catch (BadCredentialsException e) {
-        throw new CredenciaisInvalidasException("E-mail ou senha inválidosaaaaa");
+        throw new CredenciaisInvalidasException("E-mail ou senha inválidos");
     }
 
     Usuario usuario = (Usuario) authentication.getPrincipal();
 
     if (!usuario.getStatus().equals(StatusUsuario.ATIVO)) {
-        throw new CredenciaisInvalidasException("Conta bloqueada. Entre em contato com o suporte.");
+        throw new CredenciaisInvalidasException("Sua conta ainda não foi aprovada. Procure o gerente.");
     }
 
     Map<String, Object> resposta = usuarioService.dadosSessao(usuario);

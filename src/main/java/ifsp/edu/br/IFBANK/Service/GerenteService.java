@@ -8,19 +8,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ifsp.edu.br.IFBANK.Repository.ContaRepository;
+import ifsp.edu.br.IFBANK.Repository.UsuarioRepository;
 import ifsp.edu.br.IFBANK.model.Conta;
 import ifsp.edu.br.IFBANK.model.ContaResumoDTO;
 import ifsp.edu.br.IFBANK.model.GerenteAcaoRequest;
+import ifsp.edu.br.IFBANK.model.Usuario;
 import ifsp.edu.br.IFBANK.model.enums.StatusConta;
+import ifsp.edu.br.IFBANK.model.enums.StatusUsuario;
 import ifsp.edu.br.IFBANK.model.enums.TipoConta;
 
 @Service
 public class GerenteService {
 
     private final ContaRepository contaRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public GerenteService(ContaRepository contaRepository) {
+    public GerenteService(ContaRepository contaRepository, UsuarioRepository usuarioRepository) {
         this.contaRepository = contaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     /**
@@ -43,15 +48,14 @@ public class GerenteService {
             .map(ContaResumoDTO::from);
     }
 
-    /**
-     * Processa a ação do gerente sobre uma conta pendente.
-     * Ação "APROVAR" → status vira ATIVA.
-     * Ação "REJEITAR" → status vira BLOQUEADA.
-     */
+
     @Transactional
     public void processarConta(GerenteAcaoRequest request) {
         Conta conta = contaRepository.findById(request.getContaId())
             .orElseThrow(() -> new NoSuchElementException("Conta não encontrada: id " + request.getContaId()));
+
+            Usuario usuario = usuarioRepository.findById(request.getContaId())
+            .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado: id " + request.getContaId()));
 
         if (conta.getRole() == TipoConta.GERENTE) {
             throw new IllegalArgumentException("Não é possível alterar o status de uma conta gerente por esta operação");
@@ -69,6 +73,7 @@ public class GerenteService {
                     throw new IllegalArgumentException("Conta já está ativa");
                 }
                 conta.setStatus(StatusConta.ATIVA);
+                usuario.setStatus(StatusUsuario.ATIVO);
             }
             case "REJEITAR" -> {
                 if (conta.getStatus() == StatusConta.BLOQUEADA) {
@@ -82,9 +87,7 @@ public class GerenteService {
         contaRepository.save(conta);
     }
 
-    /**
-     * Busca os detalhes de uma conta específica (para o gerente visualizar antes de decidir).
-     */
+
     public ContaResumoDTO buscarConta( Integer contaId) {
       
         Conta conta = contaRepository.findById(contaId)
