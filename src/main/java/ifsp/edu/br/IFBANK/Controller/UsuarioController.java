@@ -1,5 +1,6 @@
 package ifsp.edu.br.IFBANK.Controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ifsp.edu.br.IFBANK.Config.JwtService;
 import ifsp.edu.br.IFBANK.Service.ContaService;
 import ifsp.edu.br.IFBANK.Service.UsuarioService;
 import ifsp.edu.br.IFBANK.model.Usuario;
@@ -21,10 +23,12 @@ public class UsuarioController {
 
     private final ContaService   contaService;
     private final UsuarioService usuarioService;
+    private final JwtService     jwtService;
 
-    public UsuarioController(UsuarioService usuarioService, ContaService contaService) {
+    public UsuarioController(UsuarioService usuarioService, ContaService contaService, JwtService jwtService) {
         this.usuarioService = usuarioService;
         this.contaService   = contaService;
+        this.jwtService     = jwtService;
     }
 
     /** POST /api/usuarios/novo */
@@ -43,9 +47,14 @@ public class UsuarioController {
 
     /** PATCH /api/usuarios/{id} */
     @PatchMapping("/{id}")
-    public ResponseEntity<Usuario> atualizar(
+    public ResponseEntity<Map<String, Object>> atualizar(
             @PathVariable Integer id,
             @RequestBody Map<String, String> dados) {
-        return ResponseEntity.ok(usuarioService.atualizar(id, dados));
+        Usuario atualizado = usuarioService.atualizar(id, dados);
+
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("usuario", atualizado);
+        resposta.put("token", jwtService.gerarToken(atualizado));
+        return ResponseEntity.ok(resposta);
     }
 }
